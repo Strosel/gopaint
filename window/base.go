@@ -45,13 +45,7 @@ func (win *Window) CreateWindow(Title string, Width, Height int) {
 		Width = 250
 	}
 
-	if win.Fps <= 0 {
-		win.loop = false
-	} else {
-		win.loop = true
-	}
-
-	win.Painter = gopaint.NewPainter(image.NewNRGBA(image.Rect(0, 0, Width, Height)))
+	win.Painter = gopaint.NewPainter(image.NewRGBA(image.Rect(0, 0, Width, Height)))
 
 	driver.Main(func(s screen.Screen) {
 		win.window, err = s.NewWindow(&screen.NewWindowOptions{
@@ -73,9 +67,12 @@ func (win *Window) CreateWindow(Title string, Width, Height int) {
 		if win.Draw != nil {
 			go func(win *Window) {
 				var start time.Time
-				t := time.Duration((1000 * 1000 * 1000) / win.Fps) // one Fps:th of a second
+				var t time.Duration
+				if win.Fps > 0 {
+					t = time.Duration((1000 * 1000 * 1000) / win.Fps) // one Fps:th of a second
+				}
 				cnt := 0
-				for win.loop || cnt == 0 {
+				for win.Fps > 0 || cnt == 0 {
 					start = time.Now()
 					win.Draw()
 					win.doDraw()
