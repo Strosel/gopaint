@@ -1,6 +1,9 @@
 package gopaint
 
-import "image"
+import (
+	"image"
+	"image/color"
+)
 
 type line struct {
 	b, e image.Point //beginning, end
@@ -47,4 +50,10 @@ func (l line) intersects(l2 line) bool {
 	}
 
 	return l.on(x) && l2.on(x)
+}
+
+type style struct {
+	color, fill        color.Color
+	weight, rotX, rotY int
+	deg                float64
 }
