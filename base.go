@@ -8,22 +8,21 @@ import (
 
 type Painter struct {
 	draw.Image
-
-	color, fill        color.Color
-	weight, rotX, rotY int
-	deg                float64
-	styles             []style
+	style
+	styles []style
 }
 
 func NewPainter(buffer draw.Image) *Painter {
 	return &Painter{
-		Image:  buffer,
-		color:  color.Black,
-		fill:   color.White,
-		weight: 1,
-		rotX:   0,
-		rotY:   0,
-		deg:    0,
+		Image: buffer,
+		style: style{
+			color:  color.Black,
+			fill:   color.White,
+			weight: 1,
+			rotX:   0,
+			rotY:   0,
+			deg:    0,
+		},
 		styles: []style{},
 	}
 }
@@ -160,25 +159,13 @@ func (p Painter) Line(x0, y0, x1, y1 int) {
 }
 
 func (p *Painter) Push() {
-	p.styles = append(p.styles, style{
-		color:  p.color,
-		fill:   p.fill,
-		weight: p.weight,
-		rotX:   p.rotX,
-		rotY:   p.rotY,
-		deg:    p.deg,
-	})
+	p.styles = append(p.styles, p.style)
 }
 
 func (p *Painter) Pop() {
 	l := len(p.styles)
 	s := p.styles[l-1]
-	p.color = s.color
-	p.fill = s.fill
-	p.weight = s.weight
-	p.rotX = s.rotX
-	p.rotY = s.rotY
-	p.deg = s.deg
+	p.style = s
 
 	p.styles = p.styles[:l-1]
 }
