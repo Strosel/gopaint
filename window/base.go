@@ -29,9 +29,12 @@ type Window struct {
 	OnMouseMove  func(mouse.Event)
 	OnMouseClick func(mouse.Event)
 
-	window     screen.Window
-	mainBuffer screen.Buffer
-	loop       bool
+	window        screen.Window
+	mainBuffer    screen.Buffer
+	loop          bool
+	frameStart    time.Time
+	frameDuration time.Duration
+	frameCount    int
 }
 
 //CreateWindow Create a New Window
@@ -43,6 +46,9 @@ func (win *Window) CreateWindow(Title string, Width, Height int) {
 	}
 	if Width < 250 {
 		Width = 250
+	}
+	if win.Fps > 0 {
+		win.frameDuration = time.Duration((1000 * 1000 * 1000) / win.Fps) // one Fps:th of a second
 	}
 
 	win.Painter = gopaint.NewPainter(image.NewRGBA(image.Rect(0, 0, Width, Height)))
@@ -63,27 +69,6 @@ func (win *Window) CreateWindow(Title string, Width, Height int) {
 			log.Fatal("Something went wrong creating the buffer; ", err)
 		}
 		defer win.mainBuffer.Release()
-
-		if win.Draw != nil {
-			go func(win *Window) {
-				var start time.Time
-				var t time.Duration
-				if win.Fps > 0 {
-					t = time.Duration((1000 * 1000 * 1000) / win.Fps) // one Fps:th of a second
-				}
-				cnt := 0
-				for win.Fps > 0 || cnt == 0 {
-					start = time.Now()
-					win.Draw()
-					win.doDraw()
-					cnt++
-
-					if time.Since(start) < t {
-						time.Sleep(time.Since(start) - t)
-					}
-				}
-			}(win)
-		}
 
 		for {
 			switch e := win.window.NextEvent().(type) {
@@ -116,8 +101,25 @@ func (win *Window) CreateWindow(Title string, Width, Height int) {
 				}
 
 			case paint.Event:
-				win.window.Upload(image.Point{0, 0}, win.mainBuffer, image.Rect(0, 0, Width, Height))
-				win.window.Publish()
+				if win.Draw != nil {
+					if win.Fps > 0 || win.frameCount == 0 {
+						win.frameStart = time.Now()
+						win.Draw()
+						win.doDraw()
+						win.frameCount++
+					}
+
+					win.window.Upload(image.Point{0, 0}, win.mainBuffer, image.Rect(0, 0, Width, Height))
+					win.window.Publish()
+
+					if time.Since(win.frameStart) < win.frameDuration {
+						time.Sleep(time.Since(win.frameStart) - win.frameDuration)
+					}
+					win.window.Send(paint.Event{})
+				} else {
+					win.window.Upload(image.Point{0, 0}, win.mainBuffer, image.Rect(0, 0, Width, Height))
+					win.window.Publish()
+				}
 			}
 		}
 	})
@@ -131,5 +133,4 @@ func (win *Window) doDraw() {
 			drawBuffer.Set(x, y, win.At(x, y))
 		}
 	}
-	win.window.Send(paint.Event{External: true})
 }
