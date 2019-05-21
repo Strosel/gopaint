@@ -1,7 +1,6 @@
 package gopaint
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 )
@@ -17,7 +16,6 @@ func makeLine(x0, y0, x1, y1 int) line {
 		b: image.Point{x0, y0},
 		e: image.Point{x1, y1},
 	}
-	fmt.Println("makeLine")
 	return l
 }
 
