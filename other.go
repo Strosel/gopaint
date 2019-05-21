@@ -11,13 +11,13 @@ type line struct {
 	v    bool        //vertical?
 }
 
-func makeLine(x0, y0, x1, y1 int) line {
-	l := line{
-		b: image.Point{x0, y0},
-		e: image.Point{x1, y1},
-	}
-	return l
-}
+// func makeLine(x0, y0, x1, y1 int) line {
+// 	l := line{
+// 		b: image.Point{x0, y0},
+// 		e: image.Point{x1, y1},
+// 	}
+// 	return l
+// }
 
 func (l line) intersects(l2 line) bool {
 	tNum := (l.b.X-l2.b.X)*(l2.b.Y-l2.e.Y) - (l.b.Y-l2.b.Y)*(l2.b.X-l2.e.X)
@@ -30,22 +30,22 @@ func (l line) intersects(l2 line) bool {
 	return 0.0 <= t && t <= 1.0 && 0.0 <= u && u <= 1.0
 }
 
-// func makeLine(x0, y0, x1, y1 int) line {
-// 	l := line{
-// 		b: image.Point{x0, y0},
-// 		e: image.Point{x1, y1},
-// 	}
-// 	if x0 != x1 {
-// 		l.k = float64(y1-y0) / float64(x1-x0)
-// 		l.m = float64(y0) - l.k*float64(x0)
-// 		l.v = false
-// 	} else {
-// 		l.k = 0
-// 		l.m = 0
-// 		l.v = true
-// 	}
-// 	return l
-// }
+func makeLine(x0, y0, x1, y1 int) line {
+	l := line{
+		b: image.Point{x0, y0},
+		e: image.Point{x1, y1},
+	}
+	if x0 != x1 {
+		l.k = float64(y1-y0) / float64(x1-x0)
+		l.m = float64(y0) - l.k*float64(x0)
+		l.v = false
+	} else {
+		l.k = 0
+		l.m = 0
+		l.v = true
+	}
+	return l
+}
 
 // func (l line) on(x int) bool {
 // 	if l.b.X < l.e.X {
