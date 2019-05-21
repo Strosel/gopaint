@@ -24,6 +24,10 @@ func (l line) intersects(l2 line) bool {
 	uNum := (l.b.X-l.e.X)*(l.b.Y-l2.b.Y) - (l.b.Y-l.e.Y)*(l.b.X-l2.b.X)
 	denom := (l.b.X-l.e.X)*(l2.b.Y-l2.e.Y) - (l.b.Y-l.e.Y)*(l2.b.X-l2.e.X)
 
+	if denom == 0 {
+		return false
+	}
+
 	t := tNum / denom
 	u := -uNum / denom
 
