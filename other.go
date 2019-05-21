@@ -25,13 +25,13 @@ func (l line) intersects(l2 line) bool {
 	denom := (l.b.X-l.e.X)*(l2.b.Y-l2.e.Y) - (l.b.Y-l.e.Y)*(l2.b.X-l2.e.X)
 
 	if denom == 0 {
-		return false
+		return true
 	}
 
 	t := tNum / denom
 	u := -uNum / denom
 
-	return 0.0 <= t && t <= 1.0 && 0.0 <= u && u <= 1.0
+	return (0.0 <= t && t <= 1.0) && (0.0 <= u && u <= 1.0)
 }
 
 func makeLine(x0, y0, x1, y1 int) line {
