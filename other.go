@@ -11,29 +11,6 @@ type line struct {
 	v    bool        //vertical?
 }
 
-// func makeLine(x0, y0, x1, y1 int) line {
-// 	l := line{
-// 		b: image.Point{x0, y0},
-// 		e: image.Point{x1, y1},
-// 	}
-// 	return l
-// }
-
-func (l line) intersects(l2 line) bool {
-	tNum := (l.b.X-l2.b.X)*(l2.b.Y-l2.e.Y) - (l.b.Y-l2.b.Y)*(l2.b.X-l2.e.X)
-	uNum := (l.b.X-l.e.X)*(l.b.Y-l2.b.Y) - (l.b.Y-l.e.Y)*(l.b.X-l2.b.X)
-	denom := (l.b.X-l.e.X)*(l2.b.Y-l2.e.Y) - (l.b.Y-l.e.Y)*(l2.b.X-l2.e.X)
-
-	if denom == 0 {
-		return true
-	}
-
-	t := tNum / denom
-	u := -uNum / denom
-
-	return (0.0 <= t && t <= 1.0) || (0.0 <= u && u <= 1.0)
-}
-
 func makeLine(x0, y0, x1, y1 int) line {
 	l := line{
 		b: image.Point{x0, y0},
@@ -51,29 +28,29 @@ func makeLine(x0, y0, x1, y1 int) line {
 	return l
 }
 
-// func (l line) on(x int) bool {
-// 	if l.b.X < l.e.X {
-// 		return x > l.b.X && x < l.e.X
-// 	}
-// 	return x < l.b.X && x > l.e.X
-// }
+func (l line) on(x int) bool {
+	if l.b.X < l.e.X {
+		return x > l.b.X && x < l.e.X
+	}
+	return x < l.b.X && x > l.e.X
+}
 
-// func (l line) intersects(l2 line) bool {
-// 	var x int
-// 	if l.v {
-// 		x = l.b.X
-// 	} else if l2.v {
-// 		x = l2.b.X
-// 	} else if l.k == l2.k {
-// 		return false
-// 	} else {
-// 		dm := l.m - l2.m
-// 		dk := l2.k - l.k
-// 		x = int(dm / dk)
-// 	}
+func (l line) intersects(l2 line) bool {
+	var x int
+	if l.v {
+		x = l.b.X
+	} else if l2.v {
+		x = l2.b.X
+	} else if l.k == l2.k {
+		return false
+	} else {
+		dm := l.m - l2.m
+		dk := l2.k - l.k
+		x = int(dm / dk)
+	}
 
-// 	return l.on(x) && l2.on(x)
-// }
+	return l.on(x) && l2.on(x)
+}
 
 type style struct {
 	color, fill        color.Color
